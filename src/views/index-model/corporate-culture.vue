@@ -13,7 +13,10 @@
                     </el-carousel>
                 </div>
                 <div class="intro">
-                    <div class="intro-content">
+                    <div class="intro-content" v-if="shopContent">
+                        <div v-html="shopContent"></div>
+                    </div>
+                    <div class="intro-content" v-else>
                         <div>公司自成立以来，始终坚持以人才为本、诚信立业的经营原则，荟萃业界精英.</div>
                         <div>
                             将国外先进的信息技术、管理方法及企业经验与国内企业的具体实际相结合，为企业供给全方位的解决方案，帮忙企业提高管理水平和生产本事,使企业在激烈的市场竞争中始终坚持竞争力:实现企业快速、稳定地发展。
@@ -26,6 +29,9 @@
 </template>
 <script>
 import BaseTitle from "@/components/base-title.vue";
+import { getShopInfo } from "@/api/cockpit.js";
+import axios from "axios";
+
 const banner1 = require("@/assets/image/index/banner-1.png");
 export default {
     name: "corporateCulture",
@@ -34,13 +40,38 @@ export default {
     },
     data() {
         return {
-            banners: [banner1]
+            banners: [banner1],
+            shopTitle: '',
+            shopContent: ''
         };
     },
     mounted() {
+        this.init();
     },
     methods: {
-
+        async init() {
+            await this.fetchShopInfo();
+        },
+        async fetchShopInfo() {
+            try {
+                const response = await getShopInfo();
+                const resData = response.data;
+                let data = null;
+                
+                if (resData && resData.success === true && resData.data) {
+                    data = resData.data;
+                } else if (resData && resData.shopInfo) {
+                    data = resData;
+                }
+                
+                if (data && data.shopInfo) {
+                    this.shopTitle = data.shopInfo.title || '';
+                    this.shopContent = data.shopInfo.content || '';
+                }
+            } catch (error) {
+                console.error('获取园区介绍数据失败:', error);
+            }
+        }
     }
 };
 </script>

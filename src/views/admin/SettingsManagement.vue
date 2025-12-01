@@ -85,6 +85,65 @@
               </el-card>
             </el-col>
           </el-row>
+          
+          <el-card class="config-card">
+            <div slot="header">
+              <span>监控项配置</span>
+            </div>
+            <div class="monitor-items-config">
+              <div v-for="(item, index) in configData['agricultural-machinery-services'].monitorItems" :key="index" class="monitor-item">
+                <el-row :gutter="10" style="margin-bottom: 10px;">
+                  <el-col :span="20">
+                    <el-input v-model="item.title" placeholder="监控项名称"></el-input>
+                  </el-col>
+                  <el-col :span="4">
+                    <el-button type="danger" size="small" @click="removeMonitorItem(index)">删除</el-button>
+                  </el-col>
+                </el-row>
+              </div>
+              <el-button type="primary" size="small" @click="addMonitorItem">添加监控项</el-button>
+            </div>
+          </el-card>
+          
+          <el-card class="config-card">
+            <div slot="header">
+              <span>顶部统计数据</span>
+            </div>
+            <el-form :model="configData['center-main'].topData" label-width="100px">
+              <el-form-item label="监控数量">
+                <el-input-number v-model="configData['center-main'].topData.monitor" :min="0"></el-input-number>
+              </el-form-item>
+              <el-form-item label="冷库面积">
+                <el-input-number v-model="configData['center-main'].topData.coldStorage" :min="0"></el-input-number>
+              </el-form-item>
+              <el-form-item label="基地面积">
+                <el-input-number v-model="configData['center-main'].topData.area" :min="0"></el-input-number>
+              </el-form-item>
+              <el-form-item label="产量">
+                <el-input-number v-model="configData['center-main'].topData.output" :min="0" :precision="2"></el-input-number>
+              </el-form-item>
+            </el-form>
+          </el-card>
+          
+          <el-card class="config-card">
+            <div slot="header">
+              <span>在线数据统计</span>
+            </div>
+            <el-form :model="configData.meteorological.onlineData" label-width="100px">
+              <el-form-item label="总数">
+                <el-input-number v-model="configData.meteorological.onlineData.all" :min="0"></el-input-number>
+              </el-form-item>
+              <el-form-item label="在线数">
+                <el-input-number v-model="configData.meteorological.onlineData.online" :min="0"></el-input-number>
+              </el-form-item>
+              <el-form-item label="离线数">
+                <el-input-number v-model="configData.meteorological.onlineData.offline" :min="0"></el-input-number>
+              </el-form-item>
+              <el-form-item label="故障数">
+                <el-input-number v-model="configData.meteorological.onlineData.fault" :min="0"></el-input-number>
+              </el-form-item>
+            </el-form>
+          </el-card>
 
           <el-card class="config-card">
             <div slot="header">
@@ -348,17 +407,46 @@
             <div class="device-list-config">
               <div v-for="(device, index) in configData.deviceList" :key="index" class="device-item">
                 <el-row :gutter="10" style="margin-bottom: 10px;">
-                  <el-col :span="8">
+                  <el-col :span="6">
                     <el-input v-model="device.name" placeholder="设备名称"></el-input>
                   </el-col>
-                  <el-col :span="8">
+                  <el-col :span="6">
                     <el-input-number v-model="device.count" :min="0" placeholder="数量"></el-input-number>
                   </el-col>
-                  <el-col :span="8">
+                  <el-col :span="6">
                     <el-input v-model="device.unit" placeholder="单位"></el-input>
+                  </el-col>
+                  <el-col :span="6">
+                    <el-button type="danger" size="small" @click="removeDevice(index)">删除</el-button>
                   </el-col>
                 </el-row>
               </div>
+              <el-button type="primary" size="small" @click="addDevice">添加设备</el-button>
+            </div>
+          </el-card>
+        </el-tab-pane>
+        
+        <!-- 地块列表配置 -->
+        <el-tab-pane label="地块列表" name="plots">
+          <el-card class="config-card">
+            <div slot="header">
+              <span>地块管理配置</span>
+            </div>
+            <div class="plots-config">
+              <div v-for="(plot, index) in configData.plots" :key="index" class="plot-item">
+                <el-row :gutter="10" style="margin-bottom: 10px;">
+                  <el-col :span="6">
+                    <el-input v-model="plot.index" placeholder="地块编号（如A、B、C）"></el-input>
+                  </el-col>
+                  <el-col :span="14">
+                    <el-input v-model="plot.name" placeholder="地块名称"></el-input>
+                  </el-col>
+                  <el-col :span="4">
+                    <el-button type="danger" size="small" @click="removePlot(index)">删除</el-button>
+                  </el-col>
+                </el-row>
+              </div>
+              <el-button type="primary" size="small" @click="addPlot">添加地块</el-button>
             </div>
           </el-card>
         </el-tab-pane>
@@ -490,6 +578,7 @@ export default {
           }
         },
         'agricultural-machinery-services': {
+          monitorItems: [],
           number: 0,
           kilometer: 0,
           mu: 0
@@ -498,6 +587,12 @@ export default {
           defaultStatistics: []
         },
         'center-main': {
+          topData: {
+            monitor: 0,
+            coldStorage: 0,
+            area: 0,
+            output: 0
+          },
           monitor: [],
           watherStations: [],
           monitorVisible: false,
@@ -515,6 +610,12 @@ export default {
           timer: null
         },
         meteorological: {
+          onlineData: {
+            all: 0,
+            online: 0,
+            offline: 0,
+            fault: 0
+          },
           sensorData: {
             illuminance: 0,
             airTemperature: 0,
@@ -566,6 +667,7 @@ export default {
         'agricultural-management': [[], []],
         'agricultural-services': [[], []],
         deviceList: [],
+        plots: [],
         'qr-info': {
           qrcode: '',
           qrtext: ''
@@ -610,9 +712,10 @@ export default {
               centetData: { number1: 0, number2: 0, number3: 0, number4: 0 },
               centetName: { name1: '实时监控', name2: '冷库面积', name3: '基地面积', name4: '农产品销售' }
             },
-            'agricultural-machinery-services': data['agricultural-machinery-services'] || { number: 0, kilometer: 0, mu: 0 },
+            'agricultural-machinery-services': data['agricultural-machinery-services'] || { monitorItems: [], number: 0, kilometer: 0, mu: 0 },
             'statistical-data': data['statistical-data'] || { defaultStatistics: [] },
             'center-main': data['center-main'] || { 
+              topData: { monitor: 0, coldStorage: 0, area: 0, output: 0 },
               monitor: [],
               watherStations: [],
               monitorVisible: false,
@@ -625,6 +728,7 @@ export default {
               timer: null
             },
             meteorological: data.meteorological || { 
+              onlineData: { all: 0, online: 0, offline: 0, fault: 0 },
               sensorData: {
                 illuminance: 0, airTemperature: 0, airHumidity: 0, atmosphericPressure: 0,
                 co2: 0, windSpeed: 0, rainfall: 0, pm25: 0, pm10: 0, lastUpdateTime: ''
@@ -649,6 +753,7 @@ export default {
             'agricultural-management': data['agricultural-management'] || [[], []],
             'agricultural-services': data['agricultural-services'] || [[], []],
             deviceList: data.deviceList || [],
+            plots: data.plots || [],
             'qr-info': data['qr-info'] || { qrcode: '', qrtext: '' },
             'center-bottom': data['center-bottom'] || { serveVisible: true }
           };
@@ -665,6 +770,40 @@ export default {
       }
     },
 
+    // 添加监控项
+    addMonitorItem() {
+      if (!this.configData['agricultural-machinery-services'].monitorItems) {
+        this.configData['agricultural-machinery-services'].monitorItems = [];
+      }
+      this.configData['agricultural-machinery-services'].monitorItems.push({ title: '' });
+    },
+    // 删除监控项
+    removeMonitorItem(index) {
+      this.configData['agricultural-machinery-services'].monitorItems.splice(index, 1);
+    },
+    // 添加设备
+    addDevice() {
+      if (!this.configData.deviceList) {
+        this.configData.deviceList = [];
+      }
+      this.configData.deviceList.push({ name: '', count: 0, unit: '台' });
+    },
+    // 删除设备
+    removeDevice(index) {
+      this.configData.deviceList.splice(index, 1);
+    },
+    // 添加地块
+    addPlot() {
+      if (!this.configData.plots) {
+        this.configData.plots = [];
+      }
+      const nextIndex = String.fromCharCode(65 + this.configData.plots.length);
+      this.configData.plots.push({ index: nextIndex, name: '' });
+    },
+    // 删除地块
+    removePlot(index) {
+      this.configData.plots.splice(index, 1);
+    },
     // 保存系统配置数据
     async saveSettings() {
       this.settingsLoading = true;
@@ -737,7 +876,8 @@ export default {
     .operation-item,
     .delivery-item,
     .service-item,
-    .device-item {
+    .device-item,
+    .plot-item {
       padding: 10px;
       border: 1px solid #e9ecef;
       border-radius: 4px;
@@ -745,11 +885,20 @@ export default {
       background: #f8f9fa;
     }
     
+    .monitor-items-config,
+    .plots-config {
+      .el-button {
+        margin-top: 10px;
+      }
+    }
+    
     .technology-config,
     .evaluation-config,
     .agricultural-management-config,
     .agricultural-services-config,
-    .device-list-config {
+    .device-list-config,
+    .monitor-items-config,
+    .plots-config {
       h4 {
         margin: 20px 0 10px 0;
         color: #333;

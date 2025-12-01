@@ -17,22 +17,13 @@
 </template>
 <script>
 import BaseTitle from "@/components/base-title.vue";
+import { getShopInfo } from "@/api/cockpit.js";
+
 export default {
     name: "corporateCulture",
     components: {
         BaseTitle
     },
-    /*************  ✨ Windsurf Command ⭐  *************/
-    /**
-     * @description the data of evaluate
-     * @property {array} headerTexts the header of table
-     * @property {object} config the config of table
-     * @property {array} datas the data of table
-     * @property {string} datas.name the name of item
-     * @property {string} datas.num the num of item
-     * @property {string} datas.address the address of item
-     */
-    /*******  69e09723-2fa2-4461-95ea-dbee092d60eb  *******/
     data() {
         return {
             headerTexts: [{
@@ -53,11 +44,11 @@ export default {
                 data: [],
             },
             datas: [
-                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心' },
-                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心' },
-                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心' },
-                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心' },
-                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心' },
+                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心', address: '4.5' },
+                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心', address: '4.5' },
+                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心', address: '4.5' },
+                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心', address: '4.5' },
+                { name: '2025-12-23', num: '“四员联动”指“农事服务中心农事服务中心', address: '4.5' },
             ],
         };
     },
@@ -65,7 +56,39 @@ export default {
         this.init();
     },
     methods: {
-        init() {
+        async init() {
+            await this.fetchData();
+            this.updateConfig();
+        },
+        async fetchData() {
+            try {
+                const response = await getShopInfo();
+                const resData = response.data;
+                let data = null;
+                
+                if (resData && resData.success === true && resData.data) {
+                    data = resData.data;
+                } else if (resData && resData.shopInfo) {
+                    data = resData;
+                }
+                
+                if (data && data.evaluate) {
+                    const evaluateData = data.evaluate;
+                    if (evaluateData.headerTexts) {
+                        this.headerTexts = evaluateData.headerTexts;
+                    }
+                    if (evaluateData.config) {
+                        this.config = { ...this.config, ...evaluateData.config };
+                    }
+                    if (evaluateData.datas) {
+                        this.datas = evaluateData.datas;
+                    }
+                }
+            } catch (error) {
+                console.error('获取监督评价数据失败:', error);
+            }
+        },
+        updateConfig() {
             const config = JSON.parse(JSON.stringify(this.config));
             config.data = this.datas.map((item, index) => {
                 return [

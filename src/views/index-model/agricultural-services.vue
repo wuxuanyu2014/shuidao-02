@@ -34,6 +34,8 @@
 </template>
 <script>
 import BaseTitle from "@/components/base-title.vue";
+import { getShopInfo } from "@/api/cockpit.js";
+
 export default {
     name: "corporateCulture",
     components: {
@@ -92,22 +94,58 @@ export default {
         this.init();
     },
     methods: {
-        init() {
+        async init() {
+            await this.fetchData();
+            this.updateConfig();
+        },
+        async fetchData() {
+            try {
+                const response = await getShopInfo();
+                const resData = response.data;
+                let data = null;
+                
+                if (resData && resData.success === true && resData.data) {
+                    data = resData.data;
+                } else if (resData && resData.shopInfo) {
+                    data = resData;
+                }
+                
+                if (data && data['agricultural-services']) {
+                    const servicesData = data['agricultural-services'];
+                    if (Array.isArray(servicesData) && servicesData.length > 0) {
+                        // 转换数据格式
+                        this.datas = servicesData.map(group => {
+                            return group.map((item, idx) => ({
+                                index: idx + 1,
+                                name: item.name || '',
+                                date: item.name || '',
+                                type: item.num || ''
+                            }));
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('获取农业服务数据失败:', error);
+            }
+        },
+        updateConfig() {
             const config = JSON.parse(JSON.stringify(this.config));
-            config.data = this.datas[this.pot].map((item, index) => {
-                const color = index % 2 === 0 ? 'rgba(17,58,99,0.75)' : ' rgba(17,58,99,0.34)';
-                return [
-                    `<div style="background:${color}">${item.index}</div>`,
-                    `<div style="background:${color}">${item.name}</div>`,
-                    `<div style="background:${color}">${item.date}</div>`,
-                    `<div style="background:${color}">${item.type}</div>`,
-                    `<div style="background:${color}"><div class="border-box">用户画像</div></div>`,
-                ]
-            })
-            this.config = config
+            if (this.datas[this.pot]) {
+                config.data = this.datas[this.pot].map((item, index) => {
+                    const color = index % 2 === 0 ? 'rgba(17,58,99,0.75)' : ' rgba(17,58,99,0.34)';
+                    return [
+                        `<div style="background:${color}">${item.index}</div>`,
+                        `<div style="background:${color}">${item.name}</div>`,
+                        `<div style="background:${color}">${item.date}</div>`,
+                        `<div style="background:${color}">${item.type}</div>`,
+                        `<div style="background:${color}"><div class="border-box">用户画像</div></div>`,
+                    ]
+                });
+            }
+            this.config = config;
         },
         tabClick(item) {
-            this.init()
+            this.updateConfig();
         }
     }
 };

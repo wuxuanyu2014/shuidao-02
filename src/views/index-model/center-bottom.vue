@@ -10,7 +10,7 @@
                     <div class="type-box">
                         <div class="label">水稻：</div>
                         <div class="value">
-                            <span class="num">516.16</span>
+                            <span class="num">{{ cropArea }}</span>
                             <span class="unit">亩</span>
                         </div>
                     </div>
@@ -54,6 +54,8 @@
 </template>
 <script>
 import BaseTitle from "@/components/base-title.vue";
+import { getShopInfo } from "@/api/cockpit.js";
+
 export default {
     components: {
         BaseTitle
@@ -66,9 +68,42 @@ export default {
                 name: '新品种培养'
             }],
             pot: 0,
+            cropArea: 516.16,
+            technologyData: {
+                tabs: [],
+                banners: []
+            }
         };
     },
+    mounted() {
+        this.init();
+    },
     methods: {
+        async init() {
+            await this.fetchData();
+        },
+        async fetchData() {
+            try {
+                const response = await getShopInfo();
+                const resData = response.data;
+                let data = null;
+                
+                if (resData && resData.success === true && resData.data) {
+                    data = resData.data;
+                } else if (resData && resData.shopInfo) {
+                    data = resData;
+                }
+                
+                if (data && data.technology) {
+                    this.technologyData = data.technology;
+                    if (data.technology.tabs) {
+                        this.tabs = data.technology.tabs;
+                    }
+                }
+            } catch (error) {
+                console.error('获取中心底部数据失败:', error);
+            }
+        },
         handleClick(path) {
             this.$router.push(path);
         },

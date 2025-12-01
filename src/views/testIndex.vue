@@ -5,7 +5,7 @@
         <dv-loading v-if="loading">Loading...</dv-loading>
         <div v-else class="host-body">
           <div class="top-bg">
-            <div class="big-title">宁海县长街镇博园区域性农事服务中心</div>
+            <div class="big-title">{{ mainTitle }}</div>
             <!-- <img src="../assets/image/index/title.png" alt=""> -->
             <!-- <div class="date-time">{{ dayTime }}</div> -->
           </div>
@@ -49,11 +49,14 @@ import Evaluate from "./index-model/evaluate.vue";
 import CenterInfo from "./index-model/center-info.vue";
 import CenterBottom from "./index-model/center-bottom.vue";
 import CenterMain from "./index-model/center-main.vue";
+import { getShopInfo } from "@/api/cockpit.js";
+
 export default {
   mixins: [drawMixin],
   data() {
     return {
       loading: true,
+      mainTitle: '宁海县长街镇博园区域性农事服务中心',
       monitorItems: [{
         title: "监控1",
       }, {
@@ -68,7 +71,6 @@ export default {
         online: 70,
         offline: 17,
         fault: 15
-
       },
       topData: {
         monitor: 30,
@@ -105,9 +107,82 @@ export default {
     CenterMain
   },
   mounted() {
-    this.cancelLoading();
+    this.init();
   },
   methods: {
+    async init() {
+      await this.fetchShopInfo();
+      this.cancelLoading();
+    },
+    async fetchShopInfo() {
+      try {
+        const response = await getShopInfo();
+        const resData = response.data;
+        let data = null;
+        
+        // 处理不同的响应格式
+        if (resData && resData.success === true && resData.data) {
+          data = resData.data;
+        } else if (resData && resData.shopInfo) {
+          data = resData;
+        }
+        
+        if (data) {
+          // 更新标题
+          if (data.title && data.title.mainTitle) {
+            this.mainTitle = data.title.mainTitle;
+          } else if (data.shopInfo && data.shopInfo.title) {
+            this.mainTitle = data.shopInfo.title;
+          }
+          
+          // 更新监控项数据
+          if (data['agricultural-machinery-services']) {
+            const machineryData = data['agricultural-machinery-services'];
+            if (machineryData.monitorItems) {
+              this.monitorItems = machineryData.monitorItems;
+            }
+          }
+          
+          // 更新在线数据
+          if (data.meteorological && data.meteorological.onlineData) {
+            this.onlineData = data.meteorological.onlineData;
+          }
+          
+          // 更新顶部数据
+          if (data['center-main'] && data['center-main'].topData) {
+            this.topData = data['center-main'].topData;
+          } else if (data['center-info'] && data['center-info'].centetData) {
+            // 兼容旧的数据格式
+            const centerData = data['center-info'].centetData;
+            this.topData = {
+              monitor: centerData.number1 || this.topData.monitor,
+              coldStorage: centerData.number2 || this.topData.coldStorage,
+              area: centerData.number3 || this.topData.area,
+              output: centerData.number4 || this.topData.output
+            };
+          }
+          
+          // 更新地块数据
+          if (data['agricultural-management'] && Array.isArray(data['agricultural-management'])) {
+            // 从农业管理数据中提取地块信息
+            // 如果数据格式是二维数组，取第一个数组作为地块数据
+            if (data['agricultural-management'].length > 0 && Array.isArray(data['agricultural-management'][0])) {
+              this.plots = data['agricultural-management'][0].map((item, index) => ({
+                index: String.fromCharCode(65 + index), // A, B, C, D...
+                name: item.name || `地块${index + 1}`
+              }));
+            }
+          } else if (data.plots) {
+            this.plots = data.plots;
+          }
+          
+          console.log('首页数据更新成功:', data);
+        }
+      } catch (error) {
+        console.error('获取商店信息失败:', error);
+        // 接口失败时使用默认数据
+      }
+    },
     cancelLoading() {
       setTimeout(() => {
         this.loading = false;

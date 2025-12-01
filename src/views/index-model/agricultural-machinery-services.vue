@@ -5,7 +5,7 @@
                 <span slot="title">监控数量</span>
             </base-title>
             <div class="info">
-                <div class="item" v-for="(item, index) in items" :key="index">
+                <div class="item" v-for="(item, index) in displayItems" :key="index">
                     <div class="text">{{ item.title }}</div>
                 </div>
             </div>
@@ -14,6 +14,8 @@
 </template>
 <script>
 import BaseTitle from "@/components/base-title.vue";
+import { getShopInfo } from "@/api/cockpit.js";
+
 export default {
     name: "corporateCulture",
     components: {
@@ -27,6 +29,7 @@ export default {
     },
     data() {
         return {
+            monitorItems: []
         };
     },
 
@@ -34,8 +37,39 @@ export default {
         this.init();
     },
     methods: {
-        init() {
-
+        async init() {
+            await this.fetchData();
+        },
+        async fetchData() {
+            try {
+                const response = await getShopInfo();
+                const resData = response.data;
+                let data = null;
+                
+                if (resData && resData.success === true && resData.data) {
+                    data = resData.data;
+                } else if (resData && resData.shopInfo) {
+                    data = resData;
+                }
+                
+                if (data && data['agricultural-machinery-services']) {
+                    const machineryData = data['agricultural-machinery-services'];
+                    if (machineryData.monitorItems) {
+                        this.monitorItems = machineryData.monitorItems;
+                    }
+                }
+            } catch (error) {
+                console.error('获取农机服务数据失败:', error);
+                // 如果接口失败，使用props传入的数据
+                if (this.items && this.items.length > 0) {
+                    this.monitorItems = this.items;
+                }
+            }
+        }
+    },
+    computed: {
+        displayItems() {
+            return this.monitorItems.length > 0 ? this.monitorItems : this.items;
         }
     }
 };

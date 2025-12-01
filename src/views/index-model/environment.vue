@@ -8,21 +8,21 @@
                 <div class="items">
                     <div class="item">
                         <div class="value">
-                            <span class="num">38</span>
+                            <span class="num">{{ deviceCount }}</span>
                             <span class="unit">台</span>
                         </div>
                         <div class="label">农机设备</div>
                     </div>
                     <div class="item">
                         <div class="value">
-                            <span class="num">56</span>
+                            <span class="num">{{ serviceKilometer }}</span>
                             <span class="unit">万KM</span>
                         </div>
                         <div class="label">累计服务</div>
                     </div>
                     <div class="item">
                         <div class="value">
-                            <span class="num">5</span>
+                            <span class="num">{{ serviceMu }}</span>
                             <span class="unit">万亩</span>
                         </div>
                         <div class="label">累计田地</div>
@@ -35,6 +35,8 @@
 </template>
 <script>
 import BaseTitle from "@/components/base-title.vue";
+import { getShopInfo } from "@/api/cockpit.js";
+
 export default {
     name: "corporateCulture",
     components: {
@@ -42,14 +44,52 @@ export default {
     },
     data() {
         return {
+            deviceCount: 38,
+            serviceKilometer: 56,
+            serviceMu: 5,
+            deviceList: []
         };
     },
     mounted() {
         this.init();
     },
     methods: {
-        init() {
+        async init() {
+            await this.fetchData();
+            this.initChart();
+        },
+        async fetchData() {
+            try {
+                const response = await getShopInfo();
+                const resData = response.data;
+                let data = null;
+                
+                if (resData && resData.success === true && resData.data) {
+                    data = resData.data;
+                } else if (resData && resData.shopInfo) {
+                    data = resData;
+                }
+                
+                if (data && data['agricultural-machinery-services']) {
+                    const machineryData = data['agricultural-machinery-services'];
+                    this.deviceCount = machineryData.number || 38;
+                    this.serviceKilometer = machineryData.kilometer || 56;
+                    this.serviceMu = machineryData.mu || 5;
+                }
+                
+                if (data && data.deviceList) {
+                    this.deviceList = data.deviceList;
+                }
+            } catch (error) {
+                console.error('获取农机维修服务数据失败:', error);
+            }
+        },
+        initChart() {
             const myChart = this.$echarts.init(this.$refs.lineBar);
+            const deviceNames = this.deviceList.length > 0 
+                ? this.deviceList.map(item => item.name)
+                : ["设备1", "设备2", "设备3", "设备4", "设备5", "设备6"];
+            
             let option = {
                 tooltip: {
                     trigger: "axis",
@@ -69,7 +109,7 @@ export default {
                     {
                         type: "category",
                         boundaryGap: false,
-                        data: ["设备1", "设备2", "设备3", "设备4", "设备5", "设备6"],
+                        data: deviceNames,
                         axisLabel: {
                             color: "rgba(255, 255, 255, 1)",
                             fontSize: 22,
@@ -93,19 +133,17 @@ export default {
                         stack: "总量",
                         data: [120, 132, 101, 134, 90, 230, 210],
                         lineStyle: {
-                            color: 'rgba(255, 209, 25, 1)', // 可以根据需要修改为您想要的颜色
+                            color: 'rgba(255, 209, 25, 1)',
                             width: 6
                         },
-                        symbolSize: 12,  // 数据点圆圈大小，默认为 4
+                        symbolSize: 12,
                         itemStyle: {
-                            color: 'rgba(255, 209, 25, 1)',  // 圆圈填充颜色
-                            borderColor: 'rgba(255, 209, 25, 1)',         // 圆圈边框颜色
-                            borderWidth: 6                  // 圆圈边框宽度
+                            color: 'rgba(255, 209, 25, 1)',
+                            borderColor: 'rgba(255, 209, 25, 1)',
+                            borderWidth: 6
                         },
                         areaStyle: {
-                            //区域填充样式
                             normal: {
-                                //线性渐变，前4个参数分别是x0,y0,x2,y2(范围0~1);相当于图形包围盒中的百分比。如果最后一个参数是‘true’，则该四个值是绝对像素位置。
                                 color: new this.$echarts.graphic.LinearGradient(
                                     0,
                                     0,
@@ -123,8 +161,8 @@ export default {
                                     ],
                                     false
                                 ),
-                                shadowColor: "rgba(53,142,215, 0.9)", //阴影颜色
-                                shadowBlur: 20, //shadowBlur设图形阴影的模糊大小。配合shadowColor,shadowOffsetX/Y, 设置图形的阴影效果。
+                                shadowColor: "rgba(53,142,215, 0.9)",
+                                shadowBlur: 20,
                             },
                         },
                     }

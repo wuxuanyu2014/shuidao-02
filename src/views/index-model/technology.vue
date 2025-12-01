@@ -13,7 +13,7 @@
                         <div class="t">
                             <div class="label">种子</div>
                             <div class="value">
-                                <span class="num">10290</span>
+                                <span class="num">{{ seedCount }}</span>
                                 斤
                             </div>
                         </div>
@@ -25,7 +25,7 @@
                         <div class="t">
                             <div class="label">种苗</div>
                             <div class="value">
-                                <span class="num">5690</span>
+                                <span class="num">{{ seedlingCount }}</span>
                                 株
                             </div>
                         </div>
@@ -37,7 +37,7 @@
                         <div class="t">
                             <div class="label">肥料</div>
                             <div class="value">
-                                <span class="num">451</span>
+                                <span class="num">{{ fertilizerCount }}</span>
                                 斤
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                         <div class="t">
                             <div class="label">农药</div>
                             <div class="value">
-                                <span class="num">854</span>
+                                <span class="num">{{ pesticideCount }}</span>
                                 瓶
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                         <div class="t">
                             <div class="label">农膜</div>
                             <div class="value">
-                                <span class="num">148</span>
+                                <span class="num">{{ filmCount }}</span>
                                 平方米
                             </div>
                         </div>
@@ -77,6 +77,8 @@
 </template>
 <script>
 import BaseTitle from "@/components/base-title.vue";
+import { getShopInfo } from "@/api/cockpit.js";
+
 export default {
     name: "corporateCulture",
     components: {
@@ -96,14 +98,41 @@ export default {
                 { date: '2025.10.1', company: 'XXXXX有限公司', type: '种苗', num: 10, unit: "KG" },
                 { date: '2025.10.1', company: 'XXXXX有限公司', type: '肥料', num: 10, unit: "KG" },
                 { date: '2025.10.1', company: 'XXXXX有限公司', type: '种子', num: 10, unit: "KG" },
-            ]
+            ],
+            seedCount: 10290,
+            seedlingCount: 5690,
+            fertilizerCount: 451,
+            pesticideCount: 854,
+            filmCount: 148
         }
     },
     mounted() {
         this.init();
     },
     methods: {
-        init() {
+        async init() {
+            await this.fetchData();
+            this.updateConfig();
+        },
+        async fetchData() {
+            try {
+                const response = await getShopInfo();
+                const resData = response.data;
+                let data = null;
+                
+                if (resData && resData.success === true && resData.data) {
+                    data = resData.data;
+                } else if (resData && resData.shopInfo) {
+                    data = resData;
+                }
+                
+                // 这里可以根据实际接口返回的数据结构来更新
+                // 目前保持默认值，如果接口有相关数据可以在这里更新
+            } catch (error) {
+                console.error('获取农资配送数据失败:', error);
+            }
+        },
+        updateConfig() {
             const config = JSON.parse(JSON.stringify(this.config));
             config.data = this.list.map((item, index) => {
                 const color = 'rgba(17, 58, 99, 0.75)';

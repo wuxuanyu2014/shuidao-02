@@ -5,7 +5,7 @@
         <dv-loading v-if="loading">Loading...</dv-loading>
         <div v-else class="host-body">
           <div class="top-bg">
-            <div class="big-title">宁海县长街镇博园区域性农事服务中心</div>
+            <div class="big-title">{{ mainTitle }}</div>
             <!-- <img src="../assets/image/index/title.png" alt=""> -->
             <!-- <div class="date-time">{{ dayTime }}</div> -->
           </div>
@@ -104,11 +104,14 @@
 
 <script>
 import drawMixin from "../utils/drawMixin";
+import { getShopInfo } from "@/api/cockpit.js";
+
 export default {
   mixins: [drawMixin],
   data() {
     return {
       loading: true,
+      mainTitle: '宁海县长街镇博园区域性农事服务中心',
       data1: [{
         name: '空气湿度',
         value: 63.7,
@@ -215,9 +218,37 @@ export default {
     };
   },
   mounted() {
-    this.cancelLoading();
+    this.init();
   },
   methods: {
+    async init() {
+      await this.fetchShopInfo();
+      this.cancelLoading();
+    },
+    async fetchShopInfo() {
+      try {
+        const response = await getShopInfo();
+        const resData = response.data;
+        let data = null;
+        
+        if (resData && resData.success === true && resData.data) {
+          data = resData.data;
+        } else if (resData && resData.shopInfo) {
+          data = resData;
+        }
+        
+        if (data) {
+          // 更新标题
+          if (data.title && data.title.mainTitle) {
+            this.mainTitle = data.title.mainTitle;
+          } else if (data.shopInfo && data.shopInfo.title) {
+            this.mainTitle = data.shopInfo.title;
+          }
+        }
+      } catch (error) {
+        console.error('获取商店信息失败:', error);
+      }
+    },
     cancelLoading() {
       setTimeout(() => {
         this.loading = false;
