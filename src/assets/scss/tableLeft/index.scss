@@ -1,0 +1,22 @@
+.dv-scroll-board .rows .ceil {
+  position: relative;
+  font-size: 16px !important;
+}
+
+.table-label {
+
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(-13deg, #01A7FC, #07FFFD);
+  border-radius: 0px 0px 10px 0px;
+  text-align: center;
+  line-height: 30px;
+  font-size: 16px;
+  font-family: DIN;
+  font-weight: 500;
+  color: #000A23;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

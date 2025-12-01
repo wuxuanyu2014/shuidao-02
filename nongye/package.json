@@ -1,0 +1,68 @@
+{
+  "name": "big-screen-vue-datav",
+  "version": "1.5.1",
+  "private": true,
+  "scripts": {
+    "serve": "node --openssl-legacy-provider ./node_modules/@vue/cli-service/bin/vue-cli-service.js serve",
+    "build": "node --openssl-legacy-provider ./node_modules/@vue/cli-service/bin/vue-cli-service.js build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@ezuikit/player-hls": "^0.1.0",
+    "@jiaminghi/data-view": "^2.7.3",
+    "@types/echarts": "^4.4.3",
+    "axios": "^1.10.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "core-js": "^3.32.0",
+    "dayjs": "^1.11.13",
+    "echarts": "^4.6.0",
+    "el-table-infinite-scroll": "2",
+    "element-ui": "^2.15.10",
+    "filemanager-webpack-plugin": "^2.0.5",
+    "svg-sprite-loader": "^6.0.11",
+    "videojs-contrib-hls": "^5.15.0",
+    "vue": "^2.6.11",
+    "vue-awesome": "^4.0.2",
+    "vue-baidu-map": "^0.21.22",
+    "vue-count-to": "^1.0.13",
+    "vue-loader": "^17.2.2",
+    "vue-router": "^3.1.5",
+    "vue-video-player": "5.0.2",
+    "vuex": "^3.1.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.2.0",
+    "@vue/cli-plugin-eslint": "^4.2.0",
+    "@vue/cli-service": "^4.2.0",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.1.2",
+    "sass": "^1.25.0",
+    "sass-loader": "^8.0.2",
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.0.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {
+      "vue/no-unused-components": "off",
+      "no-unused-vars": "off",
+      "vue/no-unused-vars": "off",
+      "no-debugger": "off"
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}
