@@ -54,7 +54,7 @@ module.exports = {
   devServer: {
     proxy: { // 配置跨域
       '/api': {
-        target: `http://cloud1-3gb8kc9hee10782c-1365771753.ap-shanghai.app.tcloudbase.com/`,
+        target: `http://cloud1-4glfr0ud0813e0c8-1389086593.ap-shanghai.app.tcloudbase.com/`,
         changeOrigin: true, // 允许跨域
         pathRewrite: {
           '^/api': '' // 重写请求

@@ -12,7 +12,7 @@
 ```javascript
 // 获取商店统一信息接口
 export const getShopInfo = () => {
-  return axios.get("http://cloud1-3gb8kc9hee10782c-1365771753.ap-shanghai.app.tcloudbase.com/getShopInfo");
+  return axios.get("http://cloud1-4glfr0ud0813e0c8-1389086593.ap-shanghai.app.tcloudbase.com/getShopInfo");
 };
 ```
 

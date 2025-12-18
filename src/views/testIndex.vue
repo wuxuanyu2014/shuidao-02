@@ -19,6 +19,7 @@
               </div>
               <div class="box center">
                 <center-main  :top-data="topData"/>
+                <iframe src="https://www.720yun.com/vr/e14jtgkkzm2" frameborder="no" width="700" height="500" ></iframe>
                 <center-bottom />
               </div>
               <div class="box right">

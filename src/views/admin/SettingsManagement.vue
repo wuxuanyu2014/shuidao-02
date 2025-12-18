@@ -144,6 +144,17 @@
               </el-form-item>
             </el-form>
           </el-card>
+          
+          <el-card class="config-card">
+            <div slot="header">
+              <span>中心底部配置</span>
+            </div>
+            <el-form :model="configData['center-bottom']" label-width="100px">
+              <el-form-item label="作物面积">
+                <el-input-number v-model="configData['center-bottom'].cropArea" :min="0" :precision="2" placeholder="亩"></el-input-number>
+              </el-form-item>
+            </el-form>
+          </el-card>
 
           <el-card class="config-card">
             <div slot="header">
@@ -470,17 +481,81 @@
 
         <!-- 技术配置 -->
         <el-tab-pane label="技术配置" name="technology">
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-card class="config-card">
+                <div slot="header">
+                  <span>标签页配置</span>
+                </div>
+                <div class="technology-config">
+                  <div v-for="(tab, index) in configData.technology.tabs" :key="index" class="tab-item">
+                    <el-input v-model="tab.name" placeholder="标签页名称" style="margin-bottom: 10px;"></el-input>
+                  </div>
+                </div>
+              </el-card>
+            </el-col>
+            <el-col :span="12">
+              <el-card class="config-card">
+                <div slot="header">
+                  <span>农资配送数量</span>
+                </div>
+                <el-form :model="configData.technology" label-width="100px">
+                  <el-form-item label="种子数量">
+                    <el-input-number v-model="configData.technology.seedCount" :min="0" placeholder="斤"></el-input-number>
+                  </el-form-item>
+                  <el-form-item label="种苗数量">
+                    <el-input-number v-model="configData.technology.seedlingCount" :min="0" placeholder="株"></el-input-number>
+                  </el-form-item>
+                  <el-form-item label="肥料数量">
+                    <el-input-number v-model="configData.technology.fertilizerCount" :min="0" placeholder="斤"></el-input-number>
+                  </el-form-item>
+                  <el-form-item label="农药数量">
+                    <el-input-number v-model="configData.technology.pesticideCount" :min="0" placeholder="瓶"></el-input-number>
+                  </el-form-item>
+                  <el-form-item label="农膜数量">
+                    <el-input-number v-model="configData.technology.filmCount" :min="0" placeholder="平方米"></el-input-number>
+                  </el-form-item>
+                </el-form>
+              </el-card>
+            </el-col>
+          </el-row>
+          
           <el-card class="config-card">
             <div slot="header">
-              <span>专家配置</span>
+              <span>农资配送列表</span>
+            </div>
+            <div class="technology-list-config">
+              <div v-for="(item, index) in configData.technology.list" :key="index" class="list-item">
+                <el-row :gutter="10" style="margin-bottom: 10px;">
+                  <el-col :span="6">
+                    <el-input v-model="item.date" placeholder="日期"></el-input>
+                  </el-col>
+                  <el-col :span="6">
+                    <el-input v-model="item.company" placeholder="公司名称"></el-input>
+                  </el-col>
+                  <el-col :span="4">
+                    <el-input v-model="item.type" placeholder="类型"></el-input>
+                  </el-col>
+                  <el-col :span="3">
+                    <el-input-number v-model="item.num" :min="0" placeholder="数量"></el-input-number>
+                  </el-col>
+                  <el-col :span="3">
+                    <el-input v-model="item.unit" placeholder="单位"></el-input>
+                  </el-col>
+                  <el-col :span="2">
+                    <el-button type="danger" size="small" @click="removeTechnologyListItem(index)">删除</el-button>
+                  </el-col>
+                </el-row>
+              </div>
+              <el-button type="primary" size="small" @click="addTechnologyListItem">添加配送记录</el-button>
+            </div>
+          </el-card>
+          
+          <el-card class="config-card">
+            <div slot="header">
+              <span>专家信息配置</span>
             </div>
             <div class="technology-config">
-              <h4>标签页配置</h4>
-              <div v-for="(tab, index) in configData.technology.tabs" :key="index" class="tab-item">
-                <el-input v-model="tab.name" placeholder="标签页名称" style="margin-bottom: 10px;"></el-input>
-              </div>
-              
-              <h4>专家信息配置</h4>
               <div v-for="(banner, index) in configData.technology.banners" :key="index" class="banner-item">
                 <el-row :gutter="10" style="margin-bottom: 10px;">
                   <el-col :span="12">
@@ -571,10 +646,10 @@ export default {
             number4: 0
           },
           centetName: {
-            name1: '实时监控',
-            name2: '冷库面积',
-            name3: '基地面积',
-            name4: '农产品销售'
+            name1: '监控',
+            name2: '冷库',
+            name3: '面积',
+            name4: '产量'
           }
         },
         'agricultural-machinery-services': {
@@ -651,15 +726,21 @@ export default {
         technology: {
           tabs: [],
           banners: [],
-          pot: 0
+          pot: 0,
+          seedCount: 0,
+          seedlingCount: 0,
+          fertilizerCount: 0,
+          pesticideCount: 0,
+          filmCount: 0,
+          list: []
         },
         evaluate: {
           headerTexts: [],
           config: {
-            rowNum: 3,
+            rowNum: 4,
             evenRowBGC: 'transparent',
             oddRowBGC: 'transparent',
-            columnWidth: [196, 408, 170],
+            columnWidth: [196],
             data: []
           },
           datas: []
@@ -673,7 +754,8 @@ export default {
           qrtext: ''
         },
         'center-bottom': {
-          serveVisible: true
+          serveVisible: true,
+          cropArea: 0
         }
       }
     }
@@ -710,7 +792,7 @@ export default {
             title: data.title || { mainTitle: '', subTitle: '' },
             'center-info': data['center-info'] || { 
               centetData: { number1: 0, number2: 0, number3: 0, number4: 0 },
-              centetName: { name1: '实时监控', name2: '冷库面积', name3: '基地面积', name4: '农产品销售' }
+              centetName: { name1: '监控', name2: '冷库', name3: '面积', name4: '产量' }
             },
             'agricultural-machinery-services': data['agricultural-machinery-services'] || { monitorItems: [], number: 0, kilometer: 0, mu: 0 },
             'statistical-data': data['statistical-data'] || { defaultStatistics: [] },
@@ -744,10 +826,10 @@ export default {
             'video-display': data['video-display'] || { 
               videoSrc: '', videoPoster: '', defaultVideoSrc: '', defaultVideoPoster: '' 
             },
-            technology: data.technology || { tabs: [], banners: [], pot: 0 },
+            technology: data.technology || { tabs: [], banners: [], pot: 0, seedCount: 0, seedlingCount: 0, fertilizerCount: 0, pesticideCount: 0, filmCount: 0, list: [] },
             evaluate: data.evaluate || { 
               headerTexts: [], 
-              config: { rowNum: 3, evenRowBGC: 'transparent', oddRowBGC: 'transparent', columnWidth: [196, 408, 170], data: [] },
+              config: { rowNum: 4, evenRowBGC: 'transparent', oddRowBGC: 'transparent', columnWidth: [196], data: [] },
               datas: [] 
             },
             'agricultural-management': data['agricultural-management'] || [[], []],
@@ -755,7 +837,7 @@ export default {
             deviceList: data.deviceList || [],
             plots: data.plots || [],
             'qr-info': data['qr-info'] || { qrcode: '', qrtext: '' },
-            'center-bottom': data['center-bottom'] || { serveVisible: true }
+            'center-bottom': data['center-bottom'] || { serveVisible: true, cropArea: 0 }
           };
           this.$message.success('配置数据加载成功');
         } else {
@@ -803,6 +885,23 @@ export default {
     // 删除地块
     removePlot(index) {
       this.configData.plots.splice(index, 1);
+    },
+    // 添加农资配送记录
+    addTechnologyListItem() {
+      if (!this.configData.technology.list) {
+        this.configData.technology.list = [];
+      }
+      this.configData.technology.list.push({ 
+        date: '', 
+        company: '', 
+        type: '', 
+        num: 0, 
+        unit: 'KG' 
+      });
+    },
+    // 删除农资配送记录
+    removeTechnologyListItem(index) {
+      this.configData.technology.list.splice(index, 1);
     },
     // 保存系统配置数据
     async saveSettings() {

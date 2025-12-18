@@ -82,6 +82,6 @@
 
 ## 注意事项
 
-- 所有API接口都使用了统一的域名：`http://cloud1-3gb8kc9hee10782c-1365771753.ap-shanghai.app.tcloudbase.com`
+- 所有API接口都使用了统一的域名：`http://cloud1-4glfr0ud0813e0c8-1389086593.ap-shanghai.app.tcloudbase.com`
 - 如需修改API域名，需要在每个组件中更新相应的URL
 - localStorage中的数据会永久保存，直到用户清除浏览器数据或网站主动清除 

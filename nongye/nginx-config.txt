@@ -1,10 +1,10 @@
 
 location /api/ {
     
-    proxy_pass http://cloud1-3gb8kc9hee10782c-1365771753.ap-shanghai.app.tcloudbase.com/;
+    proxy_pass http://cloud1-4glfr0ud0813e0c8-1389086593.ap-shanghai.app.tcloudbase.com/;
     
     
-    proxy_set_header Host cloud1-3gb8kc9hee10782c-1365771753.ap-shanghai.app.tcloudbase.com;
+    proxy_set_header Host cloud1-4glfr0ud0813e0c8-1389086593.ap-shanghai.app.tcloudbase.com;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
