@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="meteorological">
-            <base-title>
+            <base-title more="/monitor">
                 <span slot="title">数据监测</span>
             </base-title>
             <div class="info">

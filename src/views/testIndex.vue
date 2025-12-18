@@ -19,7 +19,7 @@
               </div>
               <div class="box center">
                 <center-main  :top-data="topData"/>
-                <iframe src="https://www.720yun.com/vr/e14jtgkkzm2" frameborder="no" width="700" height="500" ></iframe>
+                <iframe class="vr-iframe" src="https://www.720yun.com/vr/e14jtgkkzm2" frameborder="no"></iframe>
                 <center-bottom />
               </div>
               <div class="box right">
@@ -230,6 +230,16 @@ export default {
 .center {
   flex: 1;
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.vr-iframe {
+  width: 100%;
+  height: 1250px;
+  margin: 180px 0;
+  border: none;
+  border-radius: 4px;
 }
 
 .right,
