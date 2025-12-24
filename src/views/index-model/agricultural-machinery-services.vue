@@ -1,11 +1,11 @@
 <template>
     <div>
         <div class="agricultural-machinery-services">
-            <base-title more="/monitor">
-                <span slot="title">监控数量</span>
+            <base-title more="/activitys">
+                <span slot="title">监控安防</span>
             </base-title>
             <div class="info">
-                <div class="item" v-for="(item, index) in displayItems" :key="index">
+                <div class="item" v-for="(item, index) in displayItems" :key="index" @click="handleItemClick(index)">
                     <div class="text">{{ item.title }}</div>
                 </div>
             </div>
@@ -65,6 +65,15 @@ export default {
                     this.monitorItems = this.items;
                 }
             }
+        },
+        handleItemClick(index) {
+            // 跳转到地块管理页面，并传递选中的地块索引（监控序号对应地块序号）
+            this.$router.push({
+                path: '/activitys',
+                query: {
+                    active: index
+                }
+            });
         }
     },
     computed: {
@@ -96,6 +105,12 @@ export default {
             background: url('../../assets/image/index/jiankong.png') no-repeat center;
             background-size: 316px 74px;
             margin-bottom: 28px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            
+            &:hover {
+                opacity: 0.8;
+            }
             .text {
                 width: 170px;
                 height: 42px;

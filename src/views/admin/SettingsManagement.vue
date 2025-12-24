@@ -38,6 +38,12 @@
               <el-form-item label="副标题">
                 <el-input v-model="configData.title.subTitle" placeholder="请输入副标题"></el-input>
               </el-form-item>
+              <el-form-item label="负责人名称">
+                <el-input v-model="configData.shopInfo.managerName" placeholder="请输入负责人名称"></el-input>
+              </el-form-item>
+              <el-form-item label="负责人电话">
+                <el-input v-model="configData.shopInfo.managerPhone" placeholder="请输入负责人电话"></el-input>
+              </el-form-item>
             </el-card>
           </el-form>
         </el-tab-pane>
@@ -110,7 +116,7 @@
               <span>顶部统计数据</span>
             </div>
             <el-form :model="configData['center-main'].topData" label-width="100px">
-              <el-form-item label="监控数量">
+              <el-form-item label="监控安防">
                 <el-input-number v-model="configData['center-main'].topData.monitor" :min="0"></el-input-number>
               </el-form-item>
               <el-form-item label="冷库面积">
@@ -150,8 +156,17 @@
               <span>中心底部配置</span>
             </div>
             <el-form :model="configData['center-bottom']" label-width="100px">
-              <el-form-item label="作物面积">
+              <el-form-item label="水稻面积">
                 <el-input-number v-model="configData['center-bottom'].cropArea" :min="0" :precision="2" placeholder="亩"></el-input-number>
+              </el-form-item>
+              <el-form-item label="小麦面积">
+                <el-input-number v-model="configData['center-bottom'].wheatArea" :min="0" :precision="2" placeholder="亩"></el-input-number>
+              </el-form-item>
+              <el-form-item label="负责人名称">
+                <el-input v-model="configData['center-bottom'].managerName" placeholder="请输入负责人名称"></el-input>
+              </el-form-item>
+              <el-form-item label="负责人电话">
+                <el-input v-model="configData['center-bottom'].managerPhone" placeholder="请输入负责人电话"></el-input>
               </el-form-item>
             </el-form>
           </el-card>
@@ -336,35 +351,64 @@
               <span>农业管理配置</span>
             </div>
             <div class="agricultural-management-config">
-              <h4>农药管理</h4>
-              <div v-for="(pesticide, index) in configData['agricultural-management'][0]" :key="index" class="pesticide-item">
+              <h4>种植规划</h4>
+              <div v-for="(item, index) in configData['agricultural-management'][0]" :key="index" class="pesticide-item">
                 <el-row :gutter="10" style="margin-bottom: 10px;">
-                  <el-col :span="8">
-                    <el-input v-model="pesticide.name" placeholder="农药名称"></el-input>
+                  <el-col :span="6">
+                    <el-input v-model="item.name" placeholder="作物名称（如：水稻、小麦）"></el-input>
                   </el-col>
-                  <el-col :span="8">
-                    <el-input v-model="pesticide.num" placeholder="数量规格"></el-input>
+                  <el-col :span="6">
+                    <el-input v-model="item.num" placeholder="种植面积（如：500亩）"></el-input>
                   </el-col>
-                  <el-col :span="8">
-                    <el-input v-model="pesticide.address" placeholder="登记证号"></el-input>
+                  <el-col :span="6">
+                    <el-input v-model="item.address" placeholder="地块位置（如：A地块）"></el-input>
+                  </el-col>
+                  <el-col :span="5">
+                    <div class="image-upload-wrapper">
+                      <el-upload
+                        class="image-uploader"
+                        :action="''"
+                        :show-file-list="false"
+                        :before-upload="(file) => handleImageUpload(file, index, 0)"
+                        :disabled="uploadingImages[`0-${index}`]"
+                        accept="image/*">
+                        <div v-if="uploadingImages[`0-${index}`]" class="uploading-mask">
+                          <i class="el-icon-loading"></i>
+                          <div>上传中...</div>
+                        </div>
+                        <img v-else-if="item.image" :src="item.image" class="uploaded-image" />
+                        <i v-else class="el-icon-plus image-uploader-icon"></i>
+                      </el-upload>
+                      <div v-if="item.image && !uploadingImages[`0-${index}`]" class="image-actions">
+                        <el-button type="text" size="small" @click="removeImage(index, 0)">删除</el-button>
+                      </div>
+                    </div>
+                  </el-col>
+                  <el-col :span="1">
+                    <el-button type="danger" size="small" @click="removeAgriculturalManagementItem(index, 0)">删除</el-button>
                   </el-col>
                 </el-row>
               </div>
+              <el-button type="primary" size="small" @click="addAgriculturalManagementItem(0)">添加种植规划</el-button>
               
-              <h4>农事操作</h4>
-              <div v-for="(operation, index) in configData['agricultural-management'][1]" :key="index" class="operation-item">
+              <h4>农事记录</h4>
+              <div v-for="(item, index) in configData['agricultural-management'][1]" :key="index" class="operation-item">
                 <el-row :gutter="10" style="margin-bottom: 10px;">
                   <el-col :span="8">
-                    <el-input v-model="operation.name" placeholder="操作类型"></el-input>
+                    <el-input v-model="item.name" placeholder="操作类型（如：播种、施肥、除草）"></el-input>
                   </el-col>
                   <el-col :span="8">
-                    <el-input v-model="operation.num" placeholder="操作内容"></el-input>
+                    <el-input v-model="item.num" placeholder="状态（如：已完成、进行中、计划中）"></el-input>
                   </el-col>
-                  <el-col :span="8">
-                    <el-input v-model="operation.address" placeholder="操作说明"></el-input>
+                  <el-col :span="7">
+                    <el-input v-model="item.address" placeholder="详细说明（如：2024-10-01 已完成A地块水稻播种）"></el-input>
+                  </el-col>
+                  <el-col :span="1">
+                    <el-button type="danger" size="small" @click="removeAgriculturalManagementItem(index, 1)">删除</el-button>
                   </el-col>
                 </el-row>
               </div>
+              <el-button type="primary" size="small" @click="addAgriculturalManagementItem(1)">添加农事记录</el-button>
             </div>
           </el-card>
         </el-tab-pane>
@@ -621,18 +665,22 @@
 
 <script>
 import axios from 'axios'
+import { uploadImage } from '@/api/cockpit.js'
 
 export default {
   name: 'SettingsManagement',
   data() {
     return {
+      uploadingImages: {}, // 记录正在上传的图片索引
       // 系统配置相关数据
       settingsLoading: false,
       activeSettingsTab: 'basic',
       configData: {
         shopInfo: {
           title: '',
-          content: ''
+          content: '',
+          managerName: '',
+          managerPhone: ''
         },
         title: {
           mainTitle: '',
@@ -755,7 +803,10 @@ export default {
         },
         'center-bottom': {
           serveVisible: true,
-          cropArea: 0
+          cropArea: 0,
+          wheatArea: 0,
+          managerName: '',
+          managerPhone: ''
         }
       }
     }
@@ -764,6 +815,36 @@ export default {
     this.loadSettings();
   },
   methods: {
+    // 初始化农业管理数据，确保每个项都有image字段
+    initializeAgriculturalManagement(data) {
+      const defaultData = [[], []];
+      if (!data || !Array.isArray(data)) {
+        return defaultData;
+      }
+      
+      // 确保是二维数组
+      const result = [
+        Array.isArray(data[0]) ? data[0] : [],
+        Array.isArray(data[1]) ? data[1] : []
+      ];
+      
+      // 为种植规划（索引0）初始化字段，包括image
+      result[0] = result[0].map(item => ({
+        name: item.name || '',
+        num: item.num || '',
+        address: item.address || '',
+        image: item.image || ''
+      }));
+      
+      // 为农事记录（索引1）初始化字段，不包括image
+      result[1] = result[1].map(item => ({
+        name: item.name || '',
+        num: item.num || '',
+        address: item.address || ''
+      }));
+      
+      return result;
+    },
     // 加载系统配置数据
     async loadSettings() {
       this.settingsLoading = true;
@@ -788,7 +869,7 @@ export default {
         if (data) {
           console.log('原始数据字段:', Object.keys(data));
           this.configData = {
-            shopInfo: data.shopInfo || { title: '', content: '' },
+            shopInfo: data.shopInfo || { title: '', content: '', managerName: '', managerPhone: '' },
             title: data.title || { mainTitle: '', subTitle: '' },
             'center-info': data['center-info'] || { 
               centetData: { number1: 0, number2: 0, number3: 0, number4: 0 },
@@ -832,12 +913,12 @@ export default {
               config: { rowNum: 4, evenRowBGC: 'transparent', oddRowBGC: 'transparent', columnWidth: [196], data: [] },
               datas: [] 
             },
-            'agricultural-management': data['agricultural-management'] || [[], []],
+            'agricultural-management': this.initializeAgriculturalManagement(data['agricultural-management']),
             'agricultural-services': data['agricultural-services'] || [[], []],
             deviceList: data.deviceList || [],
             plots: data.plots || [],
             'qr-info': data['qr-info'] || { qrcode: '', qrtext: '' },
-            'center-bottom': data['center-bottom'] || { serveVisible: true, cropArea: 0 }
+            'center-bottom': data['center-bottom'] || { serveVisible: true, cropArea: 0, wheatArea: 0, managerName: '', managerPhone: '' }
           };
           this.$message.success('配置数据加载成功');
         } else {
@@ -902,6 +983,105 @@ export default {
     // 删除农资配送记录
     removeTechnologyListItem(index) {
       this.configData.technology.list.splice(index, 1);
+    },
+    // 添加农业管理项
+    addAgriculturalManagementItem(arrayIndex) {
+      if (!this.configData['agricultural-management']) {
+        this.configData['agricultural-management'] = [[], []];
+      }
+      if (!this.configData['agricultural-management'][arrayIndex]) {
+        this.configData['agricultural-management'][arrayIndex] = [];
+      }
+      // 如果是种植规划（索引0），添加image字段；如果是农事记录（索引1），不添加image字段
+      const newItem = arrayIndex === 0 
+        ? { name: '', num: '', address: '', image: '' }
+        : { name: '', num: '', address: '' };
+      this.configData['agricultural-management'][arrayIndex].push(newItem);
+    },
+    // 删除农业管理项
+    removeAgriculturalManagementItem(index, arrayIndex) {
+      if (this.configData['agricultural-management'] && 
+          this.configData['agricultural-management'][arrayIndex]) {
+        this.configData['agricultural-management'][arrayIndex].splice(index, 1);
+      }
+    },
+    // 处理图片上传
+    async handleImageUpload(file, index, arrayIndex) {
+      // 检查文件类型
+      const isImage = file.type.startsWith('image/');
+      if (!isImage) {
+        this.$message.error('只能上传图片文件！');
+        return false;
+      }
+      
+      // 检查文件大小（限制为5MB）
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        this.$message.error('上传图片大小不能超过 5MB！');
+        return false;
+      }
+      
+      // 设置上传状态
+      const uploadKey = `${arrayIndex}-${index}`;
+      this.$set(this.uploadingImages, uploadKey, true);
+      
+      try {
+        // 调用API上传图片到腾讯云
+        const response = await uploadImage(file);
+        
+        // 确保数据结构存在
+        if (!this.configData['agricultural-management']) {
+          this.configData['agricultural-management'] = [[], []];
+        }
+        if (!this.configData['agricultural-management'][arrayIndex]) {
+          this.configData['agricultural-management'][arrayIndex] = [];
+        }
+        if (!this.configData['agricultural-management'][arrayIndex][index]) {
+          this.configData['agricultural-management'][arrayIndex][index] = {};
+        }
+        
+        // 获取返回的图片URL
+        let imageUrl = '';
+        if (response.data) {
+          // 根据后端返回的数据结构获取URL
+          if (response.data.success && response.data.data && response.data.data.url) {
+            imageUrl = response.data.data.url;
+          } else if (response.data.url) {
+            imageUrl = response.data.url;
+          } else if (response.data.data) {
+            imageUrl = response.data.data;
+          } else if (typeof response.data === 'string') {
+            imageUrl = response.data;
+          }
+        }
+        
+        if (!imageUrl) {
+          throw new Error('上传失败：未获取到图片URL');
+        }
+        
+        // 保存图片URL
+        this.$set(this.configData['agricultural-management'][arrayIndex][index], 'image', imageUrl);
+        this.$message.success('图片上传成功！');
+      } catch (error) {
+        console.error('图片上传失败:', error);
+        const errorMsg = error.response?.data?.message || error.message || '未知错误';
+        this.$message.error('图片上传失败：' + errorMsg);
+      } finally {
+        // 清除上传状态
+        this.$set(this.uploadingImages, uploadKey, false);
+      }
+      
+      // 阻止默认上传行为
+      return false;
+    },
+    // 删除图片
+    removeImage(index, arrayIndex) {
+      if (this.configData['agricultural-management'] && 
+          this.configData['agricultural-management'][arrayIndex] && 
+          this.configData['agricultural-management'][arrayIndex][index]) {
+        this.$set(this.configData['agricultural-management'][arrayIndex][index], 'image', '');
+        this.$message.success('图片已删除！');
+      }
     },
     // 保存系统配置数据
     async saveSettings() {
@@ -1012,6 +1192,78 @@ export default {
     
     .el-input-number {
       width: 100%;
+    }
+    
+    .image-upload-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      .image-uploader {
+        width: 100%;
+        position: relative;
+        
+        ::v-deep .el-upload {
+          width: 100%;
+          height: 100px;
+        }
+        
+        .image-uploader-icon {
+          font-size: 28px;
+          color: #8c939d;
+          width: 100%;
+          height: 100px;
+          line-height: 100px;
+          text-align: center;
+          border: 1px dashed #d9d9d9;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s;
+          display: block;
+          
+          &:hover {
+            border-color: #409EFF;
+            color: #409EFF;
+          }
+        }
+        
+        .uploaded-image {
+          width: 100%;
+          height: 100px;
+          object-fit: cover;
+          border-radius: 6px;
+          border: 1px solid #d9d9d9;
+          cursor: pointer;
+          display: block;
+        }
+        
+        .uploading-mask {
+          width: 100%;
+          height: 100px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0, 0, 0, 0.5);
+          border-radius: 6px;
+          color: #fff;
+          
+          .el-icon-loading {
+            font-size: 24px;
+            margin-bottom: 5px;
+          }
+          
+          div {
+            font-size: 12px;
+          }
+        }
+      }
+      
+      .image-actions {
+        margin-top: 5px;
+        text-align: center;
+        width: 100%;
+      }
     }
   }
 }

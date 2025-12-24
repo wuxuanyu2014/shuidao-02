@@ -49,6 +49,14 @@ export default {
       active: 0
     };
   },
+  watch: {
+    // 监听路由变化，当路由参数改变时更新选中项
+    '$route'(to, from) {
+      if (to.path === '/activitys' && to.query.active !== from.query.active) {
+        this.setActiveFromQuery();
+      }
+    }
+  },
   mounted() {
     this.init();
   },
@@ -77,41 +85,31 @@ export default {
             this.mainTitle = data.shopInfo.title;
           }
           
-          // 更新地块列表
-          if (data.plots && Array.isArray(data.plots)) {
-            this.items = data.plots.map((plot, index) => ({
-              value: index,
-              name: plot.name || `地块${plot.index || index + 1}`
-            }));
-          } else if (data['agricultural-management'] && Array.isArray(data['agricultural-management'])) {
+          // 更新地块列表 - 与首页保持一致的数据获取逻辑
+          if (data['agricultural-management'] && Array.isArray(data['agricultural-management'])) {
             // 从农业管理数据中提取地块信息
+            // 如果数据格式是二维数组，取第一个数组作为地块数据
             if (data['agricultural-management'].length > 0 && Array.isArray(data['agricultural-management'][0])) {
               this.items = data['agricultural-management'][0].map((item, index) => ({
                 value: index,
                 name: item.name || `地块${String.fromCharCode(65 + index)}`
               }));
             }
+          } else if (data.plots && Array.isArray(data.plots)) {
+            // 兼容 plots 格式的数据
+            this.items = data.plots.map((plot, index) => ({
+              value: index,
+              name: plot.name || `地块${plot.index || String.fromCharCode(65 + index)}`
+            }));
           }
           
-          // 如果没有数据，使用默认数据
-          if (this.items.length === 0) {
-            for (let i = 0; i < 20; i++) {
-              this.items.push({
-                value: i,
-                name: `地块${String.fromCharCode(65 + i)}`
-              });
-            }
-          }
+          console.log('地块数据更新成功:', this.items);
+          // 数据加载完成后，再次设置选中项（确保数据已加载）
+          this.setActiveFromQuery();
         }
       } catch (error) {
         console.error('获取商店信息失败:', error);
-        // 接口失败时使用默认数据
-        for (let i = 0; i < 20; i++) {
-          this.items.push({
-            value: i,
-            name: `地块${String.fromCharCode(65 + i)}`
-          });
-        }
+        // 接口失败时不使用默认数据，保持空数组
       }
     },
     cancelLoading() {
@@ -123,6 +121,17 @@ export default {
       this.$router.push({
         path: '/'
       })
+    },
+    setActiveFromQuery() {
+      // 从路由查询参数中获取选中的地块索引
+      const activeIndex = this.$route.query.active;
+      if (activeIndex !== undefined && activeIndex !== null) {
+        const index = parseInt(activeIndex);
+        // 确保索引有效且在items范围内
+        if (!isNaN(index) && this.items.length > 0 && index >= 0 && index < this.items.length) {
+          this.active = index;
+        }
+      }
     },
   }
 };

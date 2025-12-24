@@ -198,6 +198,21 @@ export const createProduct = (data) => {
   });
 };
 
+// 上传图片到腾讯云
+export const uploadImage = (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  return axios({
+    method: 'post',
+    url: '/api/uploadImage',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+};
+
 // 更新商品
 export const updateProduct = (data) => {
   return axios({

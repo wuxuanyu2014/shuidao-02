@@ -48,7 +48,7 @@ export default {
             }, {
                 name: '稻麦烘干'
             }, {
-                name: '稻米加工'
+                name: '农机服务'
             }],
             pot: 0,
             config: {

@@ -11,6 +11,16 @@
                             <img :src="item" />
                         </el-carousel-item>
                     </el-carousel>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <span class="contact-label">负责人：</span>
+                            <span class="contact-value">{{ managerName }}</span>
+                        </div>
+                        <div class="contact-item" style="margin-top: 8px;">
+                            <span class="contact-label">电话：</span>
+                            <span class="contact-value">{{ managerPhone }}</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="intro">
                     <div class="intro-content" v-if="shopContent">
@@ -42,7 +52,9 @@ export default {
         return {
             banners: [banner1],
             shopTitle: '',
-            shopContent: ''
+            shopContent: '',
+            managerName: '',
+            managerPhone: ''
         };
     },
     mounted() {
@@ -67,6 +79,16 @@ export default {
                 if (data && data.shopInfo) {
                     this.shopTitle = data.shopInfo.title || '';
                     this.shopContent = data.shopInfo.content || '';
+                }
+                
+                // 更新负责人信息
+                if (data && data.shopInfo) {
+                    if (data.shopInfo.managerName !== undefined) {
+                        this.managerName = data.shopInfo.managerName;
+                    }
+                    if (data.shopInfo.managerPhone !== undefined) {
+                        this.managerPhone = data.shopInfo.managerPhone;
+                    }
                 }
             } catch (error) {
                 console.error('获取园区介绍数据失败:', error);
@@ -93,6 +115,30 @@ export default {
             height: 346px;
             padding: 8px;
             background: url("../../assets/image/index/corporate-culture-border.png") no-repeat center;
+            display: flex;
+            flex-direction: column;
+            
+            .contact-info {
+                margin-top: 12px;
+                padding: 0 8px;
+                
+                .contact-item {
+                    display: flex;
+                    align-items: center;
+                    font-size: 24px;
+                    font-weight: bold;
+                    
+                    .contact-label {
+                        color: #C9EBFF;
+                        min-width: 80px;
+                    }
+                    
+                    .contact-value {
+                        color: rgba(255, 210, 126, 1);
+                        flex: 1;
+                    }
+                }
+            }
         }
 
         .intro {

@@ -20,7 +20,7 @@
                 <div class="label">冷库</div>
                 <div class="value">
                     <div class="num">{{ topData.coldStorage }}</div>
-                    <div class="unit">㎡</div>
+                    <div class="unit">m³</div>
                 </div>
             </div>
         </div>

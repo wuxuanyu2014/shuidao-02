@@ -6,11 +6,21 @@
             </base-title>
             <div class="box">
                 <div class="plan">
-                    <img src="../../assets/image/index/center-icon-1.png" width="76px" alt="">
+                    <img src="../../assets/image/index/center-icon-1.png" width="66px" alt="">
                     <div class="type-box">
                         <div class="label">水稻：</div>
                         <div class="value">
                             <span class="num">{{ cropArea }}</span>
+                            <span class="unit">亩</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="plan" style="margin-top: 10px;">
+                    <img src="../../assets/image/index/center-icon-1.png" width="66px" alt="">
+                    <div class="type-box">
+                        <div class="label">小麦：</div>
+                        <div class="value">
+                            <span class="num">{{ wheatArea }}</span>
                             <span class="unit">亩</span>
                         </div>
                     </div>
@@ -69,6 +79,7 @@ export default {
             }],
             pot: 0,
             cropArea: 516.16,
+            wheatArea: 0,
             technologyData: {
                 tabs: [],
                 banners: []
@@ -98,6 +109,16 @@ export default {
                     this.technologyData = data.technology;
                     if (data.technology.tabs) {
                         this.tabs = data.technology.tabs;
+                    }
+                }
+                
+                // 更新作物面积数据
+                if (data && data['center-bottom']) {
+                    if (data['center-bottom'].cropArea !== undefined) {
+                        this.cropArea = data['center-bottom'].cropArea;
+                    }
+                    if (data['center-bottom'].wheatArea !== undefined) {
+                        this.wheatArea = data['center-bottom'].wheatArea;
                     }
                 }
             } catch (error) {
@@ -132,8 +153,9 @@ export default {
         .box {
             width: 858px;
             padding: 0 90px 0 66px;
-            height: 252px;
-            padding-top: 36px;
+            min-height: 252px;
+            padding-top: 20px;
+            padding-bottom: 20px;
             background: rgba(0, 38, 76, 0.51) url('../../assets/image/index/center-plant-bg.png') no-repeat left bottom;
             border-radius: 0px 0px 0px 0px;
             margin-top: 6px;

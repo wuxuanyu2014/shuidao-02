@@ -5,7 +5,7 @@
                 <span slot="title">农资配送</span>
             </base-title>
             <div class="info">
-                <div class="items">
+                <!-- <div class="items">
                     <div class="item">
                         <div class="icon">
                             <img src="../../assets/image/index/technology-icon-1.png" width="56px" alt="" />
@@ -38,12 +38,24 @@
                             <div class="label">肥料</div>
                             <div class="value">
                                 <span class="num">{{ fertilizerCount }}</span>
-                                斤
+                                吨
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="items">
+                    <div class="item">
+                        <div class="icon">
+                            <img src="../../assets/image/index/technology-icon-3.png" width="38px" alt="" />
+                        </div>
+                        <div class="t">
+                            <div class="label">肥料</div>
+                            <div class="value">
+                                <span class="num">{{ fertilizerCount }}</span>
+                                吨
+                            </div>
+                        </div>
+                    </div>
                     <div class="item">
                         <div class="icon">
                             <img src="../../assets/image/index/technology-icon-4.png" width="30px" alt="" />
@@ -52,7 +64,7 @@
                             <div class="label">农药</div>
                             <div class="value">
                                 <span class="num">{{ pesticideCount }}</span>
-                                瓶
+                                箱
                             </div>
                         </div>
                     </div>
@@ -64,7 +76,7 @@
                             <div class="label">农膜</div>
                             <div class="value">
                                 <span class="num">{{ filmCount }}</span>
-                                平方米
+                                卷
                             </div>
                         </div>
                     </div>
